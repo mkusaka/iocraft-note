@@ -4,25 +4,54 @@ An interactive TUI application to search and browse Claude projects stored in `~
 
 ## Features
 
-- Load and parse all Claude project JSONL files
+- Load and parse all Claude project JSONL files (latest 30 for performance)
 - Real-time search across all messages
 - Interactive navigation with arrow keys
 - View detailed message content
 - Fullscreen TUI with beautiful table display
 - Color-coded message types (user, assistant, system)
+- Static output mode for copying results
 
 ## How to Run
 
+### Interactive Mode (default)
 ```bash
 cargo run
 ```
 
+### Static Output Mode (copyable)
+```bash
+# Show all projects with detailed output
+cargo run --bin claude-projects-viewer-print
+
+# Search with a query
+cargo run --bin claude-projects-viewer-print "rust"
+```
+
+### Alternative Version (manual text input)
+```bash
+# If TextInput doesn't show characters properly
+cargo run --bin claude-projects-viewer-alt
+```
+
 ## Controls
 
-- **Search**: Type in the search box to filter messages across all projects
-- **↑/↓**: Navigate through search results
-- **Enter**: View detailed messages for selected project
-- **ESC**: Go back to search results or exit application
+### Interactive Mode
+- **Tab**: Toggle focus between search input and results list
+- **↑/↓**: Navigate through search results (when list has focus)
+- **Enter**: View detailed messages of selected project
+- **ESC**: Go back to list view or exit application
+- **Type to search**: Enter text when search input has focus
+
+### Alternative Version (Alt)
+- Same as above, plus:
+- **Backspace**: Delete last character in search (when search has focus)
+
+## Known Issues
+
+- TextInput may not display entered characters on some terminal configurations
+- Use the alternative version (`--bin claude-projects-viewer-alt`) if you experience this issue
+- The static output mode (`--bin claude-projects-viewer-print`) provides copyable text output
 
 ## Technologies Used
 

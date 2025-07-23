@@ -16,3 +16,11 @@ smol = "2.0.2"
 name = "claude-projects-viewer-alt"
 path = "src/main_alt.rs"
 
+[[bin]]
+name = "claude-projects-viewer-print"
+path = "src/main_print.rs"
+
+[[bin]]
+name = "claude-projects-viewer-hybrid"
+path = "src/main_hybrid.rs"
+

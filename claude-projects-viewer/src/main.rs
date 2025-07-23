@@ -28,7 +28,7 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
     let mut query = hooks.use_state(String::new);
     let mut selected_index = hooks.use_state(|| 0);
     let mut view_mode = hooks.use_state(|| ViewMode::List);
-    let mut search_has_focus = hooks.use_state(|| false);
+    let mut search_has_focus = hooks.use_state(|| true);
     
     // Search results - only calculate when query changes
     let query_str = query.to_string();
@@ -53,45 +53,43 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
     hooks.use_terminal_events({
         let results_len = search_results.len();
         move |event| match event {
-            TerminalEvent::Key(KeyEvent { code, kind, modifiers, .. }) if kind != KeyEventKind::Release => {
-                // Only handle special keys if search doesn't have focus or if it's a control key
-                if !search_has_focus.get() || modifiers.contains(KeyModifiers::CONTROL) {
-                    match code {
-                        KeyCode::Esc => {
-                            if view_mode.get() != ViewMode::List {
-                                view_mode.set(ViewMode::List);
-                            } else {
-                                should_exit.set(true);
-                            }
+            TerminalEvent::Key(KeyEvent { code, kind, .. }) if kind != KeyEventKind::Release => {
+                match code {
+                    KeyCode::Esc => {
+                        if search_has_focus.get() {
+                            // 検索フォーカス時はフォーカスを外す
+                            search_has_focus.set(false);
+                        } else if view_mode.get() != ViewMode::List {
+                            view_mode.set(ViewMode::List);
+                        } else {
+                            should_exit.set(true);
                         }
-                        KeyCode::Up => {
-                            if view_mode.get() == ViewMode::List && results_len > 0 {
-                                let current = selected_index.get();
-                                selected_index.set(if current > 0 { current - 1 } else { results_len - 1 });
-                            }
-                        }
-                        KeyCode::Down => {
-                            if view_mode.get() == ViewMode::List && results_len > 0 {
-                                let current = selected_index.get();
-                                selected_index.set((current + 1) % results_len);
-                            }
-                        }
-                        KeyCode::Enter => {
-                            if view_mode.get() == ViewMode::List && results_len > 0 {
-                                view_mode.set(ViewMode::Detail(selected_index.get()));
-                            }
-                        }
-                        KeyCode::Tab => {
-                            // Toggle focus between search and list
-                            search_has_focus.set(!search_has_focus.get());
-                        }
-                        _ => {}
                     }
-                } else if search_has_focus.get() {
-                    // Special handling for ESC when search has focus
-                    if matches!(code, KeyCode::Esc) {
-                        search_has_focus.set(false);
+                    KeyCode::Tab => {
+                        // Toggle focus between search and list
+                        search_has_focus.set(!search_has_focus.get());
                     }
+                    KeyCode::Up => {
+                        // リストフォーカス時のみ動作
+                        if !search_has_focus.get() && view_mode.get() == ViewMode::List && results_len > 0 {
+                            let current = selected_index.get();
+                            selected_index.set(if current > 0 { current - 1 } else { results_len - 1 });
+                        }
+                    }
+                    KeyCode::Down => {
+                        // リストフォーカス時のみ動作
+                        if !search_has_focus.get() && view_mode.get() == ViewMode::List && results_len > 0 {
+                            let current = selected_index.get();
+                            selected_index.set((current + 1) % results_len);
+                        }
+                    }
+                    KeyCode::Enter => {
+                        // リストフォーカス時のみ動作
+                        if !search_has_focus.get() && view_mode.get() == ViewMode::List && results_len > 0 {
+                            view_mode.set(ViewMode::Detail(selected_index.get()));
+                        }
+                    }
+                    _ => {}
                 }
             }
             _ => {}
@@ -145,7 +143,11 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             // Instructions
                             View(margin_bottom: 1) {
                                 Text(
-                                    content: "Tab: toggle search focus | ↑/↓: navigate | Enter: view | ESC: back/exit",
+                                    content: if search_has_focus.get() {
+                                        "Type to search | ESC: unfocus search | Tab: toggle focus"
+                                    } else {
+                                        "Tab: focus search | ↑/↓: navigate | Enter: view | ESC: exit"
+                                    },
                                     color: Color::Grey,
                                 )
                             }

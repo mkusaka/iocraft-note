@@ -12,9 +12,22 @@ impl ProjectParser {
         let home = home_dir().ok_or("Could not find home directory")?;
         let pattern = format!("{}/.claude/projects/**/*.jsonl", home.display());
         
-        let mut projects = Vec::new();
+        let mut project_paths: Vec<_> = glob(&pattern)?
+            .flatten()
+            .filter_map(|path| {
+                std::fs::metadata(&path).ok().map(|metadata| {
+                    let modified = metadata.modified().ok();
+                    (path, modified)
+                })
+            })
+            .collect();
         
-        for path in glob(&pattern)?.flatten() {
+        // 最終更新日時でソート（新しい順）
+        project_paths.sort_by(|a, b| b.1.cmp(&a.1));
+        
+        // 最新30個のみ読み込み
+        let mut projects = Vec::new();
+        for (path, _) in project_paths.into_iter().take(30) {
             if let Ok(project) = Self::load_project_file(&path) {
                 projects.push(project);
             }

@@ -33,7 +33,13 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
     // Search results - only calculate when query changes
     let query_str = query.to_string();
     let search_results: Vec<SearchResult> = if query_str.is_empty() {
-        Vec::new()
+        // クエリがない場合は全プロジェクトを表示
+        projects.iter()
+            .map(|project| SearchResult {
+                project_name: project.project_name.clone(),
+                messages: project.messages.clone(),
+            })
+            .collect()
     } else {
         ProjectParser::search_messages(&projects, &query_str)
             .into_iter()
@@ -111,7 +117,11 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             // Title
                             View(margin_bottom: 1) {
                                 Text(
-                                    content: format!("Claude Projects Viewer ({} projects loaded)", projects.len()),
+                                    content: if query_str.is_empty() {
+                                        format!("Claude Projects Viewer - Latest {} Projects", projects.len())
+                                    } else {
+                                        format!("Claude Projects Viewer - Search Results")
+                                    },
                                     color: Color::White,
                                     weight: Weight::Bold,
                                     align: TextAlign::Center,
@@ -128,9 +138,11 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             ) {
                                 View(flex_direction: FlexDirection::Row) {
                                     Text(content: "Search: ", color: Color::Yellow)
-                                    View(flex_grow: 1.0, background_color: Color::Black, padding_left: 1) {
+                                    View(flex_grow: 1.0, background_color: Color::DarkGrey) {
                                         TextInput(
                                             value: query.to_string(),
+                                            color: Color::White,
+                                            cursor_color: Color::Cyan,
                                             on_change: move |new_value| {
                                                 query.set(new_value);
                                             },
@@ -153,20 +165,17 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             }
                             
                             // Search Results
-                            #(if query_str.is_empty() {
+                            #(if search_results.is_empty() {
                                 element! {
                                     View(padding: 2) {
                                         Text(
-                                            content: "Enter a search query to find messages",
-                                            color: Color::DarkYellow,
-                                            align: TextAlign::Center,
+                                            content: if query_str.is_empty() {
+                                                "No projects found"
+                                            } else {
+                                                "No matching projects found"
+                                            },
+                                            color: Color::Yellow
                                         )
-                                    }
-                                }
-                            } else if search_results.is_empty() {
-                                element! {
-                                    View(padding: 2) {
-                                        Text(content: "No messages found", color: Color::Yellow)
                                     }
                                 }
                             } else {
@@ -188,7 +197,11 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                                 Text(content: "Project", weight: Weight::Bold, decoration: TextDecoration::Underline)
                                             }
                                             View(width: 20pct) {
-                                                Text(content: "Messages", weight: Weight::Bold, decoration: TextDecoration::Underline)
+                                                Text(
+                                                    content: if query_str.is_empty() { "Messages" } else { "Matches" },
+                                                    weight: Weight::Bold,
+                                                    decoration: TextDecoration::Underline
+                                                )
                                             }
                                             View(width: 40pct) {
                                                 Text(content: "Preview", weight: Weight::Bold, decoration: TextDecoration::Underline)
@@ -230,7 +243,7 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                                     }
                                                     View(width: 20pct) {
                                                         Text(
-                                                            content: format!("{} found", result.messages.len()),
+                                                            content: format!("{}", result.messages.len()),
                                                             color: Color::Cyan,
                                                         )
                                                     }
@@ -272,7 +285,11 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                             )
                                         }
                                         Text(
-                                            content: format!("{} messages found", result.messages.len()),
+                                            content: if query_str.is_empty() {
+                                                format!("{} messages in project", result.messages.len())
+                                            } else {
+                                                format!("{} messages matching search", result.messages.len())
+                                            },
                                             color: Color::Cyan,
                                         )
                                     }

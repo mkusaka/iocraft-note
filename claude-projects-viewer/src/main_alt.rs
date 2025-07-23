@@ -99,6 +99,22 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             view_mode.set(ViewMode::Detail(selected_index.get()));
                         }
                     }
+                    KeyCode::Char(c) => {
+                        // 検索フォーカス時は文字を追加
+                        if search_has_focus.get() {
+                            let mut new_query = query.to_string();
+                            new_query.push(c);
+                            query.set(new_query);
+                        }
+                    }
+                    KeyCode::Backspace => {
+                        // 検索フォーカス時はバックスペース処理
+                        if search_has_focus.get() {
+                            let mut new_query = query.to_string();
+                            new_query.pop();
+                            query.set(new_query);
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -121,11 +137,7 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             // Title
                             View(margin_bottom: 1) {
                                 Text(
-                                    content: if query_str.is_empty() {
-                                        format!("Claude Projects Viewer - Latest {} Projects", projects.len())
-                                    } else {
-                                        format!("Claude Projects Viewer - Search Results")
-                                    },
+                                    content: format!("Claude Projects Viewer (Latest {} projects)", projects.len()),
                                     color: Color::White,
                                     weight: Weight::Bold,
                                     align: TextAlign::Center,
@@ -140,31 +152,22 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                 margin_bottom: 1,
                                 width: 100pct,
                             ) {
-                                View(flex_direction: FlexDirection::Column) {
-                                    View(flex_direction: FlexDirection::Row) {
-                                        Text(content: "Search: ", color: Color::Yellow)
-                                        View(flex_grow: 1.0) {
-                                            TextInput(
-                                                value: query.to_string(),
-                                                on_change: move |new_value| {
-                                                    query.set(new_value);
-                                                },
-                                                has_focus: search_has_focus.get(),
-                                            )
-                                        }
-                                    }
-                                    #(if !query_str.is_empty() {
+                                View(flex_direction: FlexDirection::Row) {
+                                    Text(content: "Search: ", color: Color::Yellow)
+                                    Text(
+                                        content: &query_str,
+                                        color: Color::White,
+                                    )
+                                    #(if search_has_focus.get() {
                                         element! {
-                                            View(margin_top: 1) {
-                                                Text(
-                                                    content: format!("Current query: {}", query_str),
-                                                    color: Color::Cyan,
-                                                )
-                                            }
+                                            Text(
+                                                content: "_",
+                                                color: Color::Cyan,
+                                            )
                                         }
                                     } else {
                                         element! {
-                                            View {}
+                                            Text(content: "")
                                         }
                                     })
                                 }
@@ -174,7 +177,7 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                             View(margin_bottom: 1) {
                                 Text(
                                     content: if search_has_focus.get() {
-                                        "Type to search | ESC: unfocus search | Tab: toggle focus"
+                                        "Type to search | Backspace to delete | ESC: unfocus | Tab: toggle focus"
                                     } else {
                                         "Tab: focus search | ↑/↓: navigate | Enter: view | ESC: exit"
                                     },
@@ -216,7 +219,7 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                             }
                                             View(width: 20pct) {
                                                 Text(
-                                                    content: if query_str.is_empty() { "Messages" } else { "Matches" },
+                                                    content: if query_str.is_empty() { "Total Messages" } else { "Found" },
                                                     weight: Weight::Bold,
                                                     decoration: TextDecoration::Underline
                                                 )
@@ -261,7 +264,11 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                                     }
                                                     View(width: 20pct) {
                                                         Text(
-                                                            content: format!("{}", result.messages.len()),
+                                                            content: if query_str.is_empty() {
+                                                                format!("{} messages", result.messages.len())
+                                                            } else {
+                                                                format!("{} found", result.messages.len())
+                                                            },
                                                             color: Color::Cyan,
                                                         )
                                                     }
@@ -303,11 +310,7 @@ fn ClaudeProjectsViewer(mut hooks: Hooks) -> impl Into<AnyElement<'static>> {
                                             )
                                         }
                                         Text(
-                                            content: if query_str.is_empty() {
-                                                format!("{} messages in project", result.messages.len())
-                                            } else {
-                                                format!("{} messages matching search", result.messages.len())
-                                            },
+                                            content: format!("{} messages found", result.messages.len()),
                                             color: Color::Cyan,
                                         )
                                     }

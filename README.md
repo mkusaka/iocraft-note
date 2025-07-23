@@ -1,8 +1,14 @@
-# iocraft Search UI Demo
+# iocraft Demo Applications
 
-A product search UI demo application built with the iocraft library.
+This repository contains demo applications built with the iocraft library.
 
-## Features
+## Projects
+
+### 1. Product Search UI
+
+A product search UI demo application located in the root directory.
+
+#### Features
 
 - Product search with filtering by name, category, and brand
 - Navigation with arrow keys
@@ -24,12 +30,38 @@ cargo run
 - **Enter**: Display details of the selected product
 - **ESC**: Return to list view from detail view, or exit application from list view
 
+### 2. Claude Projects Viewer
+
+An interactive TUI to search and browse Claude projects stored in JSONL files.
+
+Located in the `claude-projects-viewer` directory.
+
+#### Features
+
+- Load and parse all Claude project JSONL files from `~/.claude/projects/**/*.jsonl`
+- Real-time search across all messages
+- View detailed message content with color-coded message types
+- Interactive navigation with fullscreen TUI
+
+#### How to Run
+
+```bash
+cd claude-projects-viewer
+cargo run
+```
+
+#### Controls
+
+- **Tab**: Toggle focus between search input and results list
+- **↑/↓**: Navigate through search results (when list has focus)
+- **Enter**: View detailed messages of selected project
+- **ESC**: Go back to list view or exit application
+- **Type to search**: Enter text when search input has focus
+
 ## Technologies Used
 
 - [iocraft](https://github.com/ccbrown/iocraft) - A React-like declarative TUI library
 - Rust
-- serde/serde_json - JSON data loading
-
-## Screenshots
-
-The application displays products in a clean table format with headers showing Product Name, Brand, Category, Price, and Stock status. Selected rows are highlighted with a green border, and alternating row colors improve readability.
+- serde/serde_json - JSON/JSONL data parsing
+- glob - File pattern matching
+- home - Home directory detection

@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "name": "MacBook Pro 14\"",
+    "category": "Laptop",
+    "price": 1999,
+    "description": "Apple M3 Pro chip with 11-core CPU and 14-core GPU, 18GB unified memory",
+    "brand": "Apple",
+    "inStock": true
+  },
+  {
+    "id": 2,
+    "name": "ThinkPad X1 Carbon Gen 11",
+    "category": "Laptop",
+    "price": 1599,
+    "description": "14\" WUXGA display, Intel Core i7-1365U, 16GB RAM, 512GB SSD",
+    "brand": "Lenovo",
+    "inStock": true
+  },
+  {
+    "id": 3,
+    "name": "Dell XPS 13",
+    "category": "Laptop",
+    "price": 1299,
+    "description": "13.4\" FHD+ display, Intel Core i5-1340P, 16GB RAM, 512GB SSD",
+    "brand": "Dell",
+    "inStock": false
+  },
+  {
+    "id": 4,
+    "name": "iPhone 15 Pro",
+    "category": "Phone",
+    "price": 999,
+    "description": "6.1\" Super Retina XDR display, A17 Pro chip, 256GB storage",
+    "brand": "Apple",
+    "inStock": true
+  },
+  {
+    "id": 5,
+    "name": "Samsung Galaxy S24 Ultra",
+    "category": "Phone",
+    "price": 1199,
+    "description": "6.8\" QHD+ display, Snapdragon 8 Gen 3, 12GB RAM, 256GB storage",
+    "brand": "Samsung",
+    "inStock": true
+  },
+  {
+    "id": 6,
+    "name": "Google Pixel 8 Pro",
+    "category": "Phone",
+    "price": 999,
+    "description": "6.7\" LTPO OLED display, Google Tensor G3, 12GB RAM, 128GB storage",
+    "brand": "Google",
+    "inStock": true
+  },
+  {
+    "id": 7,
+    "name": "iPad Pro 12.9\"",
+    "category": "Tablet",
+    "price": 1099,
+    "description": "12.9\" Liquid Retina XDR display, M2 chip, 128GB storage",
+    "brand": "Apple",
+    "inStock": true
+  },
+  {
+    "id": 8,
+    "name": "Samsung Galaxy Tab S9+",
+    "category": "Tablet",
+    "price": 999,
+    "description": "12.4\" AMOLED display, Snapdragon 8 Gen 2, 12GB RAM, 256GB storage",
+    "brand": "Samsung",
+    "inStock": false
+  },
+  {
+    "id": 9,
+    "name": "Microsoft Surface Pro 9",
+    "category": "Tablet",
+    "price": 1299,
+    "description": "13\" PixelSense display, Intel Core i7, 16GB RAM, 256GB SSD",
+    "brand": "Microsoft",
+    "inStock": true
+  },
+  {
+    "id": 10,
+    "name": "Sony WH-1000XM5",
+    "category": "Headphones",
+    "price": 399,
+    "description": "Industry-leading noise cancellation, 30-hour battery life",
+    "brand": "Sony",
+    "inStock": true
+  }
+]
